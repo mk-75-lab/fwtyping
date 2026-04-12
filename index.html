@@ -113,7 +113,6 @@
 
     <div class="stats" id="stats-area"></div>
     
-    <!-- inputmode="email" でモバイル等のキーボードを英数字に誘導し、IMEを抑制しやすくする -->
     <input type="text" id="hidden-input" autocomplete="off" spellcheck="false" inputmode="email">
 
     <script>
@@ -186,24 +185,17 @@
                 { kanji: "シュタルク", roman: "shutaruku" },
                 { kanji: "推しの子", roman: "oshinoko" },
                 { kanji: "星野アイ", roman: "hoshinoai" },
-                { kanji: "重曹を舐める天才子役", roman: "juusouonamerutensaikoyaku" },
                 { kanji: "Ｂ小町", roman: "bi-komachi" },
                 { kanji: "暗殺教室", roman: "ansatsukyoushitsu" },
                 { kanji: "殺せんせー", roman: "korosense-" },
                 { kanji: "マッハ２０", roman: "mahhanijuu" },
                 { kanji: "鬼滅の刃", roman: "kimetunoyaiba" },
                 { kanji: "判断が遅い", roman: "hanndanngaosoi" },
-                { kanji: "めぐみん", roman: "meguminn" },
                 { kanji: "ホロライブ", roman: "hororaibu" },
                 { kanji: "にじさんじ", roman: "nijisanji" },
                 { kanji: "ぶいすぽっ！", roman: "buisupo" },
-                { kanji: "あおぎり高校", roman: "aogirikoukou" },
-                { kanji: "のりプロ", roman: "noripuro" },
-                { kanji: "スパチャ", roman: "supacha" },
-                { kanji: "ナイスパ", roman: "naisupa" },
                 { kanji: "赤スパ", roman: "akasupa" },
                 { kanji: "昇龍拳", roman: "shouryuken" },
-                { kanji: "ストリートファイター", roman: "sutori-tofaitaku" },
                 { kanji: "エーペックス", roman: "e-pekkusu" },
                 { kanji: "ヴァロラント", roman: "varoranto" }
             ],
@@ -216,27 +208,21 @@
                 { kanji: "キャッシュフロー", roman: "kyasshufuro-" },
                 { kanji: "ＰＤＣＡサイクル", roman: "pdcasaikuru" },
                 { kanji: "売掛金", roman: "urikakekin" },
-                { kanji: "買掛金", roman: "kaikakekin" },
-                { kanji: "貸倒引当金", roman: "kashidaorehikiatekinn" }
+                { kanji: "買掛金", roman: "kaikakekin" }
             ],
             SLANG_DESPAIR: [
                 { kanji: "垢バン", roman: "akaban" },
                 { kanji: "凍結", roman: "touketu" },
                 { kanji: "草ｗｗ", roman: "kusaww" },
                 { kanji: "それな", roman: "sorena" },
-                { kanji: "わかりみ", roman: "wakarimi" },
                 { kanji: "詰んだ", roman: "tsunda" },
-                { kanji: "爆速", roman: "bakusoku" },
                 { kanji: "自宅警備員", roman: "jitakukeibiin" },
                 { kanji: "オワコン", roman: "owakon" },
-                { kanji: "無理ゲー", roman: "murige-" },
                 { kanji: "進捗どうですか", roman: "shinchokudoudesuka" },
                 { kanji: "ストロングゼロ", roman: "sutoronguzero" },
-                { kanji: "からあげクン", roman: "karaagekun" },
                 { kanji: "社畜", roman: "shachiku" },
                 { kanji: "増税メガネ", roman: "zouzeimegane" },
-                { kanji: "自己肯定感", roman: "jikokouteikan" },
-                { kanji: "自己効力感", roman: "jikokouryokukann" }
+                { kanji: "自己肯定感", roman: "jikokouteikan" }
             ],
             REQUEST_LIST: [
                 { kanji: "努力は裏切らない（白目）", roman: "doryokuhauragiranai" },
@@ -246,10 +232,8 @@
                 { kanji: "目標未達", roman: "mokuhyoumitatu" },
                 { kanji: "アットホームな職場です（絶望）", roman: "attoho-munashokubadesu" },
                 { kanji: "定時退社は都市伝説", roman: "teijitaishahatoshidensetsu" },
-                { kanji: "有給休暇という名のファンタジー", roman: "yuukyuukyuukatuunonofantaji-" },
-                { kanji: "進捗どうですか？（殺意）", roman: "shinchokudoudesuka" },
-                { kanji: "お前もタコピーにしてやろうか", roman: "omaemotakopi-nishiteyarouka" }
-            ]
+                { kanji: "進捗どうですか？（殺意）", roman: "shinchokudoudesuka" }
+            ],
             KUSO_W: [
                 { kanji: "インターネット最高", roman: "inta-nettosaikou" },
                 { kanji: "インターネットやめろ", roman: "inta-nettoyamero" },
@@ -259,7 +243,7 @@
                 { kanji: "草超えて森", roman: "kusakoetemori" },
                 { kanji: "それなすぎて草", roman: "sorenasugitekusa" },
                 { kanji: "一生寝てたい", roman: "isshounetetai" },
-                { kanji: "金がねぇ", roman: "kaneuganee" },
+                { kanji: "金がねぇ", roman: "kaneganee" },
                 { kanji: "圧倒的成長（嘘）", roman: "attoutekiseichou" },
                 { kanji: "人生詰んだｗｗ", roman: "jinseitsundaww" },
                 { kanji: "語彙力消失", roman: "goiryokusyoushitsu" },
@@ -295,24 +279,20 @@
             ['ja', 'zya', 'jya'], ['ju', 'zyu', 'jyu'], ['jo', 'zyo', 'jyo']
         ];
 
-        // キーボードイベントの監視（Enterで開始）
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                if (!elements.startScreen.classList.contains('hidden')) {
+                if (elements.startScreen && !elements.startScreen.classList.contains('hidden')) {
                     startGame();
-                } else if (elements.gameScreen.innerHTML.includes('TIME UP')) {
+                } else if (elements.gameScreen && elements.gameScreen.innerHTML.includes('TIME UP')) {
                     location.reload();
                 }
             }
         });
 
         function startGame() {
+            if (!elements.startScreen || !elements.gameScreen) return;
             elements.startScreen.classList.add('hidden');
             elements.gameScreen.classList.remove('hidden');
-            elements.gameScreen.innerHTML = `
-                <div id="word-container" class="word-display"></div>
-                <div id="roman-display" class="text-2xl md:text-5xl text-center mt-4 text-gray-800 font-mono tracking-widest font-black uppercase"></div>
-            `;
             
             shuffleWords();
             currentWordIndex = 0;
@@ -361,10 +341,9 @@
         }
 
         function displayWord() {
-            const word = wordList[currentWordIndex];
             const container = document.getElementById('word-container');
             if (container) {
-                container.textContent = word.kanji;
+                container.textContent = wordList[currentWordIndex].kanji;
                 container.classList.add('pop-effect');
                 setTimeout(() => container.classList.remove('pop-effect'), 200);
             }
@@ -389,8 +368,8 @@
 
         window.onload = () => {
             const input = elements.hiddenInput;
-            
-            // IME入力を検知したら強制的に内容をクリアする（半角英数入力を促す）
+            if (!input) return;
+
             input.addEventListener('compositionstart', () => {
                 input.value = '';
             });
@@ -398,7 +377,6 @@
             input.addEventListener('input', (e) => {
                 if (timeLeft <= 0) return;
                 
-                // IME確定後の文字列が入ってきた場合の対策
                 if (e.inputType === 'insertCompositionText') {
                     input.value = '';
                     return;
@@ -490,20 +468,22 @@
             const kpm = Math.floor(score / ((timeSpent || 1) / 60)) || 0;
             const accuracy = score + missCount > 0 ? Math.floor((score / (score + missCount)) * 100) : 0;
 
-            elements.gameScreen.innerHTML = `
-                <div class="text-center flex flex-col items-center">
-                    <h2 class="text-7xl font-black mb-12 text-pink-600">TIME UP</h2>
-                    <div class="space-y-4 text-xl font-bold text-gray-700 mb-16 text-left">
-                        <p>KPM (速度): <span class="text-white">${kpm}</span></p>
-                        <p>ACCURACY (精度): <span class="text-white">${accuracy}%</span></p>
-                        <p>COMPLETE (単語数): <span class="text-white">${currentWordIndex}</span></p>
-                        <p>MISS (ミス): <span class="text-white">${missCount}</span></p>
+            if (elements.gameScreen) {
+                elements.gameScreen.innerHTML = `
+                    <div class="text-center flex flex-col items-center">
+                        <h2 class="text-7xl font-black mb-12 text-pink-600">TIME UP</h2>
+                        <div class="space-y-4 text-xl font-bold text-gray-700 mb-16 text-left">
+                            <p>KPM (速度): <span class="text-white">${kpm}</span></p>
+                            <p>ACCURACY (精度): <span class="text-white">${accuracy}%</span></p>
+                            <p>COMPLETE (単語数): <span class="text-white">${currentWordIndex}</span></p>
+                            <p>MISS (ミス): <span class="text-white">${missCount}</span></p>
+                        </div>
+                        <button onclick="location.reload()" class="start-btn">
+                            お疲れさん (Enter)
+                        </button>
                     </div>
-                    <button onclick="location.reload()" class="start-btn">
-                        お疲れさん (Enter)
-                    </button>
-                </div>
-            `;
+                `;
+            }
         }
     </script>
 </body>
