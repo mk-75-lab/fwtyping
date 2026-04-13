@@ -196,7 +196,6 @@
             }
         }
 
-        <script>
         const CATEGORIES = {
             AI_AND_TECH: [
                 { kanji: "チャットＧＰＴ", roman: "tyattogpt" },
@@ -369,6 +368,7 @@
                 { kanji: "猫になりたい", roman: "nekoninaritai" }
             ]
         };
+
         const wordList = Object.values(CATEGORIES).flat();
         let currentWordIndex = 0;
         let currentCharIndex = 0;
@@ -394,7 +394,6 @@
             ['ja', 'zya', 'jya'], ['ju', 'zyu', 'jyu'], ['jo', 'zyo', 'jyo']
         ];
 
-        // 物理キーコードから文字を取得する関数 (A/あ 無視の核心)
         function getCharFromCode(code) {
             if (code.startsWith('Key')) return code.slice(3).toLowerCase();
             if (code.startsWith('Digit')) return code.slice(5);
@@ -407,27 +406,7 @@
             return null;
         }
 
-        window.addEventListener('keydown', (e) => {
-            // Enterキーの処理
-            if (e.key === 'Enter') {
-                if (elements.startScreen && !elements.startScreen.classList.contains('hidden')) {
-                    startGame();
-                } else if (elements.gameScreen && elements.gameScreen.innerHTML.includes('TIME UP')) {
-                    location.reload();
-                }
-                return;
-            }
-
-            // ゲーム中の入力処理 (物理キーを優先的に奪う)
-            if (!elements.gameScreen.classList.contains('hidden') && timeLeft > 0) {
-                const char = getCharFromCode(e.code);
-                if (char) {
-                    e.preventDefault(); // IMEの挙動を完全にブロック
-                    handleInput(char);
-                }
-            }
-        });
-
+        // 入力を処理する肝心の関数 (ここが index.html に抜けていた！)
         function handleInput(inputChar) {
             const targetChar = currentRomanText[currentCharIndex];
             if (inputChar === targetChar) {
@@ -439,6 +418,25 @@
             }
             updateStats();
         }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (elements.startScreen && !elements.startScreen.classList.contains('hidden')) {
+                    startGame();
+                } else if (elements.gameScreen && elements.gameScreen.innerHTML.includes('TIME UP')) {
+                    location.reload();
+                }
+                return;
+            }
+
+            if (!elements.gameScreen.classList.contains('hidden') && timeLeft > 0) {
+                const char = getCharFromCode(e.code);
+                if (char) {
+                    e.preventDefault();
+                    handleInput(char);
+                }
+            }
+        });
 
         function startGame() {
             elements.startScreen.classList.add('hidden');
