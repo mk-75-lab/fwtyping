@@ -156,7 +156,28 @@
             { task: "今忙しい", kanji: "あいにく取り込んでおります", roman: "ainukutorikondeorimasu" },
             { task: "ちょっといいかな？", kanji: "今、お手すきでしょうか", roman: "imaotesukideshouka" },
             { task: "了解！", kanji: "かしこまりました", roman: "kashikomarimashita" },
-            { task: "確認して", kanji: "ご確認のほどよろしくお願いいたします", roman: "gokakuninnnohodoroshikuonegaitashimasu" }
+            { task: "確認して", kanji: "ご確認のほどよろしくお願いいたします", roman: "gokakuninnnohodoroshikuonegaitashimasu" },
+            { task: "名前が間違ってるよ", kanji: "お名前に誤りがございます", roman: "onamaeniayamarigagozaimasu" },
+            { task: "よろしく", kanji: "何卒よろしくお願い申し上げます", roman: "nanitozuyoroshikuonegaimoushiagemasu" },
+            { task: "どうすればいい？", kanji: "いかがいたしましょうか", roman: "ikagaitashimashouka" },
+            { task: "資料持ってきたよ", kanji: "資料を持参いたしました", roman: "shiryouwojisanitashimashita" },
+            { task: "遅れます", kanji: "到着が遅れる見込みです", roman: "touchakugaokurerumikomidesu" },
+            { task: "誰に聞けばいい？", kanji: "どなたに伺えばよろしいでしょうか", roman: "donataniukagaebayoroshiideshouka" },
+            { task: "会議に出るよ", kanji: "会議に出席させていただきます", roman: "kaiginishussekisaseteitadakimasu" },
+            { task: "メール送って", kanji: "メールをお送りいただけますでしょうか", roman: "me-ruwoookuriitadakemashitadehouka" },
+            { task: "また今度ね", kanji: "またの機会によろしくお願いいたします", roman: "matanokikainiyoroshikuonegaitashimasu" },
+            { task: "明日休みます", kanji: "明日は休暇をいただいております", roman: "ashitahakyuukawoitadaiteorimasu" },
+            { task: "さっき言ったじゃん", kanji: "先ほど申し上げた通りです", roman: "sakihodomoushiagetatooridesu" },
+            { task: "教えてほしい", kanji: "ご教示いただけますでしょうか", roman: "gokyoujiitadakemashitadehouka" },
+            { task: "今いいかな？", kanji: "ただいまお時間よろしいでしょうか", roman: "tadaimaojikanyoroshiideshouka" },
+            { task: "これ読んで", kanji: "ご一読いただけますと幸いです", roman: "goichidokuitadadakemastosaiwaidesu" },
+            { task: "知ってるよ", kanji: "存じ上げております", roman: "zonjiagetemorimasu" },
+            { task: "忘れてた", kanji: "失念しておりました", roman: "shitsunenshiteorimashita" },
+            { task: "やっておくね", kanji: "対応させていただきます", roman: "taiousaseteitadakimasu" },
+            { task: "また連絡するわ", kanji: "改めてご連絡差し上げます", roman: "aratametegorenrakusashiagemasu" },
+            { task: "座って", kanji: "お掛けください", roman: "okakekudasai" },
+            { task: "後でやるわ", kanji: "追ってご連絡いたします", roman: "ottegorenrakuitashimasu" },
+            { task: "どこにいるの？", kanji: "どちらにいらっしゃいますか", roman: "dochiraniirasshaimasuka" }
         ];
 
         let wordList = [...KEIGO_DATA];
@@ -177,6 +198,13 @@
             get hiddenInput() { return document.getElementById('hidden-input'); },
             get statsArea() { return document.getElementById('stats-area'); }
         };
+
+        const FLEX_GROUPS = [
+            ['si', 'shi'], ['ti', 'chi'], ['tu', 'tsu'], ['zi', 'ji'], ['fu', 'hu'], ['n', 'nn'],
+            ['sya', 'sha'], ['syu', 'shu'], ['syo', 'sho'],
+            ['tya', 'cha'], ['tyu', 'chu'], ['tyo', 'cho'],
+            ['ja', 'zya', 'jya'], ['ju', 'zyu', 'jyu'], ['jo', 'zyo', 'jyo']
+        ];
 
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -226,20 +254,53 @@
         window.onload = () => {
             elements.hiddenInput.addEventListener('input', (e) => {
                 if (timeLeft <= 0) return;
-                const char = e.target.value.toLowerCase().slice(-1);
+                const inputVal = e.target.value.toLowerCase();
+                const char = inputVal.slice(-1);
                 if (!char) return;
+                
                 if (char === currentRomanText[currentCharIndex]) {
-                    currentCharIndex++; score++;
-                    if (currentCharIndex >= currentRomanText.length) { currentWordIndex++; setTimeout(nextWord, 50); }
-                    else renderRoman();
+                    processCorrect();
+                } else if (tryFlexibleMatch(char)) {
+                    processCorrect();
                 } else {
-                    missCount++;
-                    const span = elements.romanDisplay.children[currentCharIndex];
-                    if (span) { span.classList.add('char-error'); setTimeout(() => span.classList.remove('char-error'), 150); }
+                    processMiss();
                 }
                 e.target.value = ''; updateStats();
             });
         };
+
+        function processCorrect() {
+            currentCharIndex++; score++;
+            if (currentCharIndex >= currentRomanText.length) { currentWordIndex++; setTimeout(nextWord, 50); }
+            else renderRoman();
+        }
+
+        function processMiss() {
+            missCount++;
+            const span = elements.romanDisplay.children[currentCharIndex];
+            if (span) { span.classList.add('char-error'); setTimeout(() => span.classList.remove('char-error'), 150); }
+        }
+
+        function tryFlexibleMatch(inputChar) {
+            for (const offset of [0, 1]) {
+                const startIdx = currentCharIndex - offset;
+                if (startIdx < 0) continue;
+                const part = currentRomanText.slice(startIdx);
+                for (const group of FLEX_GROUPS) {
+                    for (const member of group) {
+                        if (part.startsWith(member)) {
+                            for (const alt of group) {
+                                if (alt !== member && inputChar === alt[offset]) {
+                                    currentRomanText = currentRomanText.slice(0, startIdx) + alt + currentRomanText.slice(startIdx + member.length);
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return false;
+        }
 
         function updateStats() {
             const timeSpent = 120 - timeLeft;
@@ -250,10 +311,20 @@
         function endGame() {
             const timeSpent = 120 - timeLeft;
             const kpm = Math.floor(score / ((timeSpent || 1) / 60)) || 0;
+            const accuracy = score + missCount > 0 ? Math.floor((score / (score + missCount)) * 100) : 0;
             elements.gameScreen.innerHTML = `
                 <div class="result-card text-center">
-                    <h2 class="text-5xl font-black mb-8">TRAINING OVER</h2>
-                    <p class="text-3xl font-black text-blue-600 mb-8">${kpm} KPM</p>
+                    <h2 class="text-5xl font-black mb-8 text-slate-900">TRAINING OVER</h2>
+                    <div class="grid grid-cols-2 gap-8 mb-12 text-left w-full max-w-md">
+                        <div>
+                            <p class="text-sm text-slate-400 font-bold mb-1">速度</p>
+                            <p class="text-3xl font-black text-blue-600">${kpm} KPM</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-slate-400 font-bold mb-1">精度</p>
+                            <p class="text-3xl font-black text-blue-600">${accuracy}%</p>
+                        </div>
+                    </div>
                     <button onclick="location.reload()" class="start-btn">終了 (Enter)</button>
                 </div>
             `;
