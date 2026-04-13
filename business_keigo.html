@@ -170,7 +170,7 @@
             { task: "さっき言ったじゃん", kanji: "先ほど申し上げた通りです", roman: "sakihodomoushiagetatooridesu" },
             { task: "教えてほしい", kanji: "ご教示いただけますでしょうか", roman: "gokyoujiitadakemashitadehouka" },
             { task: "今いいかな？", kanji: "ただいまお時間よろしいでしょうか", roman: "tadaimaojikanyoroshiideshouka" },
-            { task: "これ読んで", kanji: "ご一読いただけますと幸いです", roman: "goichidokuitadadakemastosaiwaidesu" },
+            { task: "これ読んで", kanji: "ご一読いただけますと幸いです", roman: "goichidokuitadakemastosaiwaidesu" },
             { task: "知ってるよ", kanji: "存じ上げております", roman: "zonjiagetemorimasu" },
             { task: "忘れてた", kanji: "失念しておりました", roman: "shitsunenshiteorimashita" },
             { task: "やっておくね", kanji: "対応させていただきます", roman: "taiousaseteitadakimasu" },
@@ -218,6 +218,18 @@
             return null;
         }
 
+        function handleInput(inputChar) {
+            const targetChar = currentRomanText[currentCharIndex];
+            if (inputChar === targetChar) {
+                processCorrect();
+            } else if (tryFlexibleMatch(inputChar)) {
+                processCorrect();
+            } else {
+                processMiss();
+            }
+            updateStats();
+        }
+
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 if (elements.startScreen && !elements.startScreen.classList.contains('hidden')) startGame();
@@ -233,18 +245,6 @@
                 }
             }
         });
-
-        function handleInput(inputChar) {
-            const targetChar = currentRomanText[currentCharIndex];
-            if (inputChar === targetChar) {
-                processCorrect();
-            } else if (tryFlexibleMatch(inputChar)) {
-                processCorrect();
-            } else {
-                processMiss();
-            }
-            updateStats();
-        }
 
         function startGame() {
             elements.startScreen.classList.add('hidden');
