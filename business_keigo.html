@@ -206,12 +206,45 @@
             ['ja', 'zya', 'jya'], ['ju', 'zyu', 'jyu'], ['jo', 'zyo', 'jyo']
         ];
 
+        function getCharFromCode(code) {
+            if (code.startsWith('Key')) return code.slice(3).toLowerCase();
+            if (code.startsWith('Digit')) return code.slice(5);
+            if (code.startsWith('Numpad') && code.length === 7) return code.slice(6);
+            if (code === 'Minus' || code === 'NumpadSubtract') return '-';
+            if (code === 'Period' || code === 'NumpadDecimal') return '.';
+            if (code === 'Comma') return ',';
+            if (code === 'Space') return ' ';
+            if (code === 'Slash' || code === 'NumpadDivide') return '/';
+            return null;
+        }
+
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 if (elements.startScreen && !elements.startScreen.classList.contains('hidden')) startGame();
                 else if (elements.gameScreen && elements.gameScreen.innerHTML.includes('TRAINING OVER')) location.reload();
+                return;
+            }
+
+            if (!elements.gameScreen.classList.contains('hidden') && timeLeft > 0) {
+                const char = getCharFromCode(e.code);
+                if (char) {
+                    e.preventDefault();
+                    handleInput(char);
+                }
             }
         });
+
+        function handleInput(inputChar) {
+            const targetChar = currentRomanText[currentCharIndex];
+            if (inputChar === targetChar) {
+                processCorrect();
+            } else if (tryFlexibleMatch(inputChar)) {
+                processCorrect();
+            } else {
+                processMiss();
+            }
+            updateStats();
+        }
 
         function startGame() {
             elements.startScreen.classList.add('hidden');
@@ -250,24 +283,6 @@
             }
             elements.romanDisplay.innerHTML = html;
         }
-
-        window.onload = () => {
-            elements.hiddenInput.addEventListener('input', (e) => {
-                if (timeLeft <= 0) return;
-                const inputVal = e.target.value.toLowerCase();
-                const char = inputVal.slice(-1);
-                if (!char) return;
-                
-                if (char === currentRomanText[currentCharIndex]) {
-                    processCorrect();
-                } else if (tryFlexibleMatch(char)) {
-                    processCorrect();
-                } else {
-                    processMiss();
-                }
-                e.target.value = ''; updateStats();
-            });
-        };
 
         function processCorrect() {
             currentCharIndex++; score++;
