@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>独白するユニバーサル横タイピング</title>
+    <title>独白するマサキ式：ユニバーサルタイピング</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⌨️</text></svg>">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@700;900&display=swap');
         
+        /* 基本設定：ダークモード（デフォルト） */
         body {
             background-color: #010101;
             color: #ffffff;
@@ -20,6 +21,13 @@
             justify-content: center;
             align-items: center;
             margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* ライトモード用の上書き設定 */
+        body.light-mode {
+            background-color: #ffffff;
+            color: #1a1a1a;
         }
 
         .word-display {
@@ -35,9 +43,14 @@
             letter-spacing: -0.02em;
             padding: 0 1.5rem;
         }
+        body.light-mode .word-display { color: #000000; }
 
         .char-next { color: #444444; }
+        body.light-mode .char-next { color: #cbd5e1; }
+
         .char-correct { color: #00ffcc; text-shadow: 0 0 15px rgba(0, 255, 204, 0.7); }
+        body.light-mode .char-correct { color: #2563eb; text-shadow: none; }
+
         .char-error { color: #ff0055; text-decoration: underline; background-color: rgba(255, 0, 85, 0.25); }
         
         .pop-effect {
@@ -59,6 +72,7 @@
             text-align: center;
             font-family: monospace;
         }
+        body.light-mode .stats { color: #94a3b8; }
 
         #hidden-input {
             position: absolute;
@@ -70,6 +84,8 @@
             border-bottom: 6px solid #00ffcc;
             animation: blink 0.4s infinite;
         }
+        body.light-mode .cursor { border-color: #3b82f6; }
+
         @keyframes blink {
             50% { border-color: transparent; }
         }
@@ -89,6 +105,53 @@
             background: #00ffcc;
             transform: scale(1.03);
         }
+        body.light-mode .start-btn {
+            background: #1e293b;
+            color: #ffffff;
+        }
+        body.light-mode .start-btn:hover { background: #3b82f6; }
+
+        .mode-link {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: #555;
+            font-weight: bold;
+            text-decoration: none;
+            border: 1px solid #333;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
+        }
+        .mode-link:hover {
+            color: #00ffcc;
+            border-color: #00ffcc;
+        }
+        body.light-mode .mode-link {
+            border-color: #e2e8f0;
+            color: #94a3b8;
+        }
+        body.light-mode .mode-link:hover {
+            color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        /* テーマ切り替えボタン */
+        .theme-toggle {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: #555;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border: 1px solid #333;
+            background: transparent;
+            transition: all 0.3s;
+        }
+        .theme-toggle:hover { color: #ffffff; border-color: #ffffff; }
+        body.light-mode .theme-toggle { border-color: #e2e8f0; color: #94a3b8; }
+        body.light-mode .theme-toggle:hover { color: #1a1a1a; border-color: #1a1a1a; }
 
         .timer-warning {
             color: #ff0055 !important;
@@ -97,6 +160,9 @@
     </style>
 </head>
 <body>
+
+    <button onclick="toggleTheme()" class="theme-toggle" id="theme-btn">LIGHT MODE</button>
+    <a href="business_keigo.html" class="mode-link">ビジネス敬語訓練へ</a>
 
     <div id="start-screen" class="flex flex-col items-center">
         <h1 class="text-4xl md:text-7xl font-black mb-4 tracking-tighter italic text-center">独白するマサキ式<br>ユニバーサル横タイピング</h1>
@@ -117,7 +183,18 @@
     <input type="text" id="hidden-input" autocomplete="off" spellcheck="false" inputmode="email">
 
     <script>
-        const CATEGORIES = {
+        // テーマ切り替え
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+            const btn = document.getElementById('theme-btn');
+            if (document.body.classList.contains('light-mode')) {
+                btn.textContent = 'DARK MODE';
+            } else {
+                btn.textContent = 'LIGHT MODE';
+            }
+        }
+
+            const CATEGORIES = {
             AI_AND_TECH: [
                 { kanji: "チャットＧＰＴ", roman: "tyattogpt" },
                 { kanji: "エヌビディア", roman: "enubidia" },
@@ -259,7 +336,6 @@
                 { kanji: "ストロングゼロ", roman: "sutoronguzero" },
                 { kanji: "社畜", roman: "shachiku" },
                 { kanji: "所得税", roman: "syotokuzei" },
-                { kanji: "働いて働いて働いて働いて働いてまいります", roman: "hataraitehataraitehataraitehataraitehataraitemairimasu" },
                 { kanji: "自己肯定感", roman: "jikokouteikan" }
             ],
             REQUEST_LIST: [
@@ -290,14 +366,11 @@
                 { kanji: "猫になりたい", roman: "nekoninaritai" }
             ]
         };
-
         const wordList = Object.values(CATEGORIES).flat();
-
         let currentWordIndex = 0;
         let currentCharIndex = 0;
         let score = 0;
         let missCount = 0;
-        let startTime;
         let timeLeft = 120;
         let timerId = null;
         let currentRomanText = "";
@@ -329,26 +402,15 @@
         });
 
         function startGame() {
-            if (!elements.startScreen || !elements.gameScreen) return;
             elements.startScreen.classList.add('hidden');
             elements.gameScreen.classList.remove('hidden');
-            
             shuffleWords();
             currentWordIndex = 0;
             score = 0;
             missCount = 0;
             timeLeft = 120;
-            startTime = Date.now();
-            
             nextWord();
-            
             elements.hiddenInput.focus();
-            document.addEventListener('click', () => {
-                if (elements.gameScreen && !elements.gameScreen.classList.contains('hidden')) {
-                    elements.hiddenInput.focus();
-                }
-            });
-
             if (timerId) clearInterval(timerId);
             timerId = setInterval(() => {
                 timeLeft--;
@@ -370,9 +432,8 @@
 
         function nextWord() {
             if (currentWordIndex >= wordList.length) {
-                clearInterval(timerId);
-                endGame();
-                return;
+                shuffleWords();
+                currentWordIndex = 0;
             }
             currentCharIndex = 0;
             currentRomanText = wordList[currentWordIndex].roman;
@@ -407,34 +468,19 @@
 
         window.onload = () => {
             const input = elements.hiddenInput;
-            if (!input) return;
-
-            input.addEventListener('compositionstart', () => {
-                input.value = '';
-            });
-
+            input.addEventListener('compositionstart', () => { input.value = ''; });
             input.addEventListener('input', (e) => {
                 if (timeLeft <= 0) return;
-                
-                if (e.inputType === 'insertCompositionText') {
-                    input.value = '';
-                    return;
-                }
-
                 const inputVal = e.target.value.toLowerCase();
                 const inputChar = inputVal.slice(-1);
                 if (inputChar === "") return;
-
-                const targetChar = currentRomanText[currentCharIndex];
-                
-                if (inputChar === targetChar) {
+                if (inputChar === currentRomanText[currentCharIndex]) {
                     processCorrect();
                 } else if (tryFlexibleMatch(inputChar)) {
                     processCorrect();
                 } else {
                     processMiss();
                 }
-
                 e.target.value = '';
                 updateStats();
             });
@@ -465,15 +511,13 @@
             for (const offset of [0, 1]) {
                 const startIdx = currentCharIndex - offset;
                 if (startIdx < 0) continue;
-                
                 const part = currentRomanText.slice(startIdx);
                 for (const group of FLEX_GROUPS) {
                     for (const member of group) {
                         if (part.startsWith(member)) {
                             for (const alt of group) {
                                 if (alt !== member && inputChar === alt[offset]) {
-                                    const newRoman = currentRomanText.slice(0, startIdx) + alt + currentRomanText.slice(startIdx + member.length);
-                                    currentRomanText = newRoman;
+                                    currentRomanText = currentRomanText.slice(0, startIdx) + alt + currentRomanText.slice(startIdx + member.length);
                                     return true;
                                 }
                             }
@@ -486,43 +530,28 @@
 
         function updateStats() {
             const area = elements.statsArea;
-            if (!area) return;
             const min = Math.floor(timeLeft / 60);
             const sec = timeLeft % 60;
             const timeStr = `${min}:${sec.toString().padStart(2, '0')}`;
             const timeSpent = 120 - timeLeft;
             const kpm = Math.floor(score / ((timeSpent || 1) / 60)) || 0;
-            
-            const timerClass = timeLeft <= 10 ? 'timer-warning' : '';
-            area.innerHTML = `
-                <span class="${timerClass}">TIME: ${timeStr}</span> | 
-                COMPLETE: ${currentWordIndex} | 
-                SPEED: ${kpm} KPM | 
-                MISS: ${missCount}
-            `;
+            area.innerHTML = `TIME: ${timeStr} | COMPLETE: ${currentWordIndex} | SPEED: ${kpm} KPM | MISS: ${missCount}`;
         }
 
         function endGame() {
             const timeSpent = 120 - timeLeft;
             const kpm = Math.floor(score / ((timeSpent || 1) / 60)) || 0;
             const accuracy = score + missCount > 0 ? Math.floor((score / (score + missCount)) * 100) : 0;
-
-            if (elements.gameScreen) {
-                elements.gameScreen.innerHTML = `
-                    <div class="text-center flex flex-col items-center">
-                        <h2 class="text-7xl font-black mb-12 text-pink-600">TIME UP</h2>
-                        <div class="space-y-4 text-xl font-bold text-gray-700 mb-16 text-left">
-                            <p>KPM (速度): <span class="text-white">${kpm}</span></p>
-                            <p>ACCURACY (精度): <span class="text-white">${accuracy}%</span></p>
-                            <p>COMPLETE (単語数): <span class="text-white">${currentWordIndex}</span></p>
-                            <p>MISS (ミス): <span class="text-white">${missCount}</span></p>
-                        </div>
-                        <button onclick="location.reload()" class="start-btn">
-                            お疲れさん (Enter)
-                        </button>
-                    </div>
-                `;
-            }
+            elements.gameScreen.innerHTML = `
+                <div class="text-center">
+                    <h2 class="text-7xl font-black mb-12 text-pink-600">TIME UP</h2>
+                    <div class="space-y-4 text-xl font-bold text-gray-700 mb-16 text-left inline-block">
+                        <p>KPM: <span class="text-white">${kpm}</span></p>
+                        <p>ACCURACY: <span class="text-white">${accuracy}%</span></p>
+                    </div><br>
+                    <button onclick="location.reload()" class="start-btn">お疲れさん (Enter)</button>
+                </div>
+            `;
         }
     </script>
 </body>
