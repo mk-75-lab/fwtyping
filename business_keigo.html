@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>独白するマサキ式：ビジネス敬語訓練</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⌨️</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;700;900&display=swap');
+        
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            font-family: 'Noto Sans JP', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .task-display {
+            font-size: 1.25rem;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #f1f5f9;
+            border-radius: 0.5rem;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .word-display {
+            font-size: clamp(2rem, 7vw, 5rem);
+            font-weight: 900;
+            line-height: 1.2;
+            text-align: center;
+            word-break: break-all;
+            min-height: 10rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 1.5rem;
+            color: #0f172a;
+        }
+
+        .char-next { color: #cbd5e1; }
+        .char-correct { color: #2563eb; }
+        .char-error { color: #ef4444; text-decoration: underline; background-color: #fee2e2; }
+        
+        .pop-effect {
+            animation: pop 0.15s ease-out;
+        }
+        @keyframes pop {
+            0% { transform: scale(0.98); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .stats {
+            position: absolute;
+            bottom: 3rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #94a3b8;
+            letter-spacing: 0.1em;
+            width: 100%;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        #hidden-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .cursor {
+            border-bottom: 4px solid #3b82f6;
+            animation: blink 0.5s infinite;
+        }
+        @keyframes blink { 50% { border-color: transparent; } }
+
+        .start-btn {
+            background: #1e293b;
+            color: #ffffff;
+            padding: 1rem 4rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border-radius: 0.75rem;
+            border: none;
+        }
+        .start-btn:hover {
+            background: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        .mode-link {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            color: #94a3b8;
+            font-weight: bold;
+            text-decoration: none;
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s;
+        }
+        .mode-link:hover {
+            color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .result-card {
+            background: #ffffff;
+            padding: 3rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            border: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="mode-link">通常モードへ戻る</a>
+
+    <div id="start-screen" class="flex flex-col items-center max-w-2xl px-6">
+        <div class="mb-6 text-blue-600 font-black text-xl tracking-widest text-center uppercase">Business Skill Training</div>
+        <h1 class="text-4xl md:text-6xl font-black mb-6 tracking-tight text-center text-slate-900">独白するマサキ式<br>ビジネス敬語訓練</h1>
+        <p class="text-lg md:text-xl mb-12 text-slate-500 font-medium text-center">タメ口を適切な敬語へ変換する訓練です。</p>
+        <button onclick="startGame()" class="start-btn">訓練開始 (Enter)</button>
+    </div>
+
+    <div id="game-screen" class="hidden w-full flex flex-col items-center">
+        <div id="task-container" class="task-display"></div>
+        <div id="word-container" class="word-display"></div>
+        <div id="roman-display" class="text-xl md:text-3xl text-center mt-6 text-slate-300 font-mono tracking-[0.2em] font-bold uppercase"></div>
+    </div>
+
+    <div class="stats" id="stats-area"></div>
+    <input type="text" id="hidden-input" autocomplete="off" spellcheck="false" inputmode="email">
+
+    <script>
+        const KEIGO_DATA = [
+            { task: "これ、終わったよ", kanji: "完了いたしました", roman: "kanryouitashimashita" },
+            { task: "ちょっと来て", kanji: "少々お時間よろしいでしょうか", roman: "shoushouojikanyoroshiideshouka" },
+            { task: "わかった！", kanji: "承知いたしました", roman: "shouchiitashimashita" },
+            { task: "誰だっけ？", kanji: "お名前を伺ってもよろしいでしょうか", roman: "onamaewoukagattemoyoroshiideshouka" },
+            { task: "無理です", kanji: "致しかねます", roman: "itashikanemasu" },
+            { task: "すまん！", kanji: "失礼いたしました", roman: "shitsureiitashimashita" },
+            { task: "見てくれた？", kanji: "ご査収いただけましたでしょうか", roman: "gosashuuitadakemashitadehouka" },
+            { task: "今忙しい", kanji: "あいにく取り込んでおります", roman: "ainukutorikondeorimasu" },
+            { task: "ちょっといいかな？", kanji: "今、お手すきでしょうか", roman: "imaotesukideshouka" },
+            { task: "了解！", kanji: "かしこまりました", roman: "kashikomarimashita" },
+            { task: "確認して", kanji: "ご確認のほどよろしくお願いいたします", roman: "gokakuninnnohodoroshikuonegaitashimasu" }
+        ];
+
+        let wordList = [...KEIGO_DATA];
+        let currentWordIndex = 0;
+        let currentCharIndex = 0;
+        let score = 0;
+        let missCount = 0;
+        let timeLeft = 120;
+        let timerId = null;
+        let currentRomanText = "";
+
+        const elements = {
+            get startScreen() { return document.getElementById('start-screen'); },
+            get gameScreen() { return document.getElementById('game-screen'); },
+            get taskContainer() { return document.getElementById('task-container'); },
+            get wordContainer() { return document.getElementById('word-container'); },
+            get romanDisplay() { return document.getElementById('roman-display'); },
+            get hiddenInput() { return document.getElementById('hidden-input'); },
+            get statsArea() { return document.getElementById('stats-area'); }
+        };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                if (elements.startScreen && !elements.startScreen.classList.contains('hidden')) startGame();
+                else if (elements.gameScreen && elements.gameScreen.innerHTML.includes('TRAINING OVER')) location.reload();
+            }
+        });
+
+        function startGame() {
+            elements.startScreen.classList.add('hidden');
+            elements.gameScreen.classList.remove('hidden');
+            wordList.sort(() => Math.random() - 0.5);
+            currentWordIndex = 0; score = 0; missCount = 0; timeLeft = 120;
+            nextWord();
+            elements.hiddenInput.focus();
+            timerId = setInterval(() => {
+                timeLeft--; updateStats();
+                if (timeLeft <= 0) { clearInterval(timerId); endGame(); }
+            }, 1000);
+        }
+
+        function nextWord() {
+            if (currentWordIndex >= wordList.length) { wordList.sort(() => Math.random() - 0.5); currentWordIndex = 0; }
+            currentCharIndex = 0; currentRomanText = wordList[currentWordIndex].roman;
+            displayWord();
+        }
+
+        function displayWord() {
+            const word = wordList[currentWordIndex];
+            elements.taskContainer.textContent = `【タメ口】${word.task}`;
+            elements.wordContainer.textContent = word.kanji;
+            elements.wordContainer.classList.add('pop-effect');
+            setTimeout(() => elements.wordContainer.classList.remove('pop-effect'), 200);
+            renderRoman();
+        }
+
+        function renderRoman() {
+            let html = '';
+            for (let i = 0; i < currentRomanText.length; i++) {
+                if (i < currentCharIndex) html += `<span class="char-correct">${currentRomanText[i]}</span>`;
+                else if (i === currentCharIndex) html += `<span class="cursor">${currentRomanText[i]}</span>`;
+                else html += `<span class="char-next">${currentRomanText[i]}</span>`;
+            }
+            elements.romanDisplay.innerHTML = html;
+        }
+
+        window.onload = () => {
+            elements.hiddenInput.addEventListener('input', (e) => {
+                if (timeLeft <= 0) return;
+                const char = e.target.value.toLowerCase().slice(-1);
+                if (!char) return;
+                if (char === currentRomanText[currentCharIndex]) {
+                    currentCharIndex++; score++;
+                    if (currentCharIndex >= currentRomanText.length) { currentWordIndex++; setTimeout(nextWord, 50); }
+                    else renderRoman();
+                } else {
+                    missCount++;
+                    const span = elements.romanDisplay.children[currentCharIndex];
+                    if (span) { span.classList.add('char-error'); setTimeout(() => span.classList.remove('char-error'), 150); }
+                }
+                e.target.value = ''; updateStats();
+            });
+        };
+
+        function updateStats() {
+            const timeSpent = 120 - timeLeft;
+            const kpm = Math.floor(score / ((timeSpent || 1) / 60)) || 0;
+            elements.statsArea.innerHTML = `TIME: ${Math.floor(timeLeft/60)}:${(timeLeft%60).toString().padStart(2,'0')} | SPEED: ${kpm} KPM | MISS: ${missCount}`;
+        }
+
+        function endGame() {
+            const timeSpent = 120 - timeLeft;
+            const kpm = Math.floor(score / ((timeSpent || 1) / 60)) || 0;
+            elements.gameScreen.innerHTML = `
+                <div class="result-card text-center">
+                    <h2 class="text-5xl font-black mb-8">TRAINING OVER</h2>
+                    <p class="text-3xl font-black text-blue-600 mb-8">${kpm} KPM</p>
+                    <button onclick="location.reload()" class="start-btn">終了 (Enter)</button>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>
